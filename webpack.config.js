@@ -16,33 +16,34 @@ const entries = function () {
     let map = {};
     for (let i = 0; i < entryFiles.length; i++) {
         let filePath = entryFiles[i];
-        let fp = filePath.substring("js/".length + srcDir.length+1, filePath.length);
-        let filename = fp.substring(0, fp.lastIndexOf('.'));
+        let relativePath = filePath.substring("js/".length + srcDir.length+1, filePath.length);
+        let filename = relativePath.substring(0, relativePath.lastIndexOf('.'));
         map[filename] = filePath
     }
     return map;
 }
 
 const html_plugins = function () {
-    let entryHtml = glob.sync(srcDir + '/**/*.html')
-    let r = []
+    let viewDir = srcDir+"/view";
+    let entryHtml = glob.sync(viewDir + '/**/*.html')
+    let htmlWebpackPluginArray = []
     let entriesFiles = entries()
     for (let i = 0; i < entryHtml.length; i++) {
         let filePath = entryHtml[i];
 
-        let fp = filePath.substring(srcDir.length+1, filePath.length);
-        let filename = fp.substring(0, fp.lastIndexOf('.'));
+        let relativePath = filePath.substring(viewDir.length+1, filePath.length);
+        let filename = relativePath.substring(0, relativePath.lastIndexOf('.'));
         let conf = {
-            template: "src/"+fp,
-            filename: fp
+            template: "src/view/"+relativePath,
+            filename: relativePath
         }
         if (filename in entriesFiles) {
             conf.inject = 'body'
             conf.chunks = ['vendor', filename]
         }
-        r.push(new HtmlWebpackPlugin(conf))
+        htmlWebpackPluginArray.push(new HtmlWebpackPlugin(conf))
     }
-    return r
+    return htmlWebpackPluginArray;
 }
 
 const plugins = [
